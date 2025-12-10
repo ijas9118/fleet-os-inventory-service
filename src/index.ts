@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 import createApp from "./app";
 import logger from "./config/logger";
 import env from "./config/validate-env";
