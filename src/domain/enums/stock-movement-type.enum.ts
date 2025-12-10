@@ -1,0 +1,6 @@
+export enum StockMovementType {
+  INBOUND = "INBOUND",
+  OUTBOUND = "OUTBOUND",
+  TRANSFER = "TRANSFER",
+  ADJUSTMENT = "ADJUSTMENT",
+}
