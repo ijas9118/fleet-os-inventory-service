@@ -46,7 +46,7 @@ export class WarehouseRepository implements IWareHouseRepository {
         state: found.address.state ?? undefined,
         postalCode: found.address.postalCode ?? undefined,
         country: found.address.country,
-        coordinates: found.address.coordinates
+        coordinates: (found.address.coordinates && found.address.coordinates.coordinates)
           ? {
               lat: found.address.coordinates.coordinates[1],
               lng: found.address.coordinates.coordinates[0],
@@ -62,7 +62,7 @@ export class WarehouseRepository implements IWareHouseRepository {
     const results = await WarehouseModel.find({
       tenantId,
       status: WarehouseStatus.ACTIVE,
-    });
+    }).lean();
 
     return results.map(found => new WarehouseEntity({
       id: found._id.toString(),
@@ -77,7 +77,7 @@ export class WarehouseRepository implements IWareHouseRepository {
         state: found.address.state ?? undefined,
         postalCode: found.address.postalCode ?? undefined,
         country: found.address.country,
-        coordinates: found.address.coordinates
+        coordinates: (found.address.coordinates && found.address.coordinates.coordinates)
           ? {
               lat: found.address.coordinates.coordinates[1],
               lng: found.address.coordinates.coordinates[0],

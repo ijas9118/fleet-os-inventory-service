@@ -19,7 +19,7 @@ const AddressSchema = new Schema(
 
 const WarehouseSchema = new Schema({
   tenantId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
     index: true,
   },
@@ -38,7 +38,7 @@ const WarehouseSchema = new Schema({
     required: true,
   },
   assignedManagerUserId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     ref: "User",
   },
   status: {
