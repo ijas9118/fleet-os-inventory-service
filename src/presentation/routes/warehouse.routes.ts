@@ -2,14 +2,15 @@ import { Router } from "express";
 
 import type { WarehouseController } from "../controllers/warehouse.controller";
 
-import { authMiddleware } from "../middlewares";
+import { requireAuth } from "../middlewares";
 
 export function buildWarehouseRoutes(controller: WarehouseController): Router {
   const router = Router();
 
-  router.post("/", controller.createWarehouse);
+  router.use(requireAuth);
 
-  router.get("/", authMiddleware(), controller.listWarehouses);
+  router.post("/", controller.createWarehouse);
+  router.get("/", controller.listWarehouses);
 
   return router;
 }

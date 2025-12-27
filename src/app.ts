@@ -7,7 +7,7 @@ import helmet from "helmet";
 
 import logger from "./config/logger";
 import { buildContainer } from "./di/container";
-import { errorHandler, limiter, notFoundHandler } from "./presentation/middlewares";
+import { errorHandler, notFoundHandler } from "./presentation/middlewares";
 import { buildRoutes } from "./presentation/routes";
 
 export default function createApp(): Application {
@@ -18,8 +18,6 @@ export default function createApp(): Application {
   app.use(helmet());
   app.use(cors());
   app.use(express.json());
-
-  app.use(limiter);
 
   app.use((req: Request, _res: Response, next: NextFunction) => {
     logger.debug(`${req.method} ${req.url}`);
