@@ -32,6 +32,7 @@ export class Warehouse {
   get id() { return this.props.id; }
   get tenantId() { return this.props.tenantId; }
   get code() { return this.props.code; }
+  get name() { return this.props.name; }
   get status() { return this.props.status; }
   get propsSnapshot() { return this.props; }
 }
