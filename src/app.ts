@@ -30,7 +30,7 @@ export default function createApp(): Application {
     res.status(STATUS_CODES.OK).json({ status: "ok" });
   });
 
-  app.use("/api", buildRoutes(container));
+  app.use("/api/v1/inventory", buildRoutes(container));
 
   app.use(notFoundHandler);
   app.use(errorHandler);
