@@ -3,7 +3,9 @@ import type { Request, Response } from "express";
 import { STATUS_CODES } from "@ahammedijas/fleet-os-shared";
 
 import type { CreateWarehouseUseCase } from "@/use-cases/create-warehouse/create-warehouse.usecase";
+import type { GetWarehouseUseCase } from "@/use-cases/get-warehouse/get-warehouse.usecase";
 import type { ListWarehousesUseCase } from "@/use-cases/list-warehouses/list-warehouses.usecase";
+import type { UpdateWarehouseStatusUseCase } from "@/use-cases/update-warehouse-status/update-warehouse-status.usecase";
 
 import { asyncHandler } from "../utils/async-handler";
 import { RequestHelper } from "../utils/request.helper";
@@ -13,6 +15,8 @@ export class WarehouseController {
   constructor(
     private _createWarehouseUC: CreateWarehouseUseCase,
     private _listWarehousesUC: ListWarehousesUseCase,
+    private _getWarehouseUC: GetWarehouseUseCase,
+    private _updateWarehouseStatusUC: UpdateWarehouseStatusUseCase,
   ) {}
 
   createWarehouse = asyncHandler(async (req: Request, res: Response) => {
@@ -57,5 +61,44 @@ export class WarehouseController {
     });
 
     ResponseHelper.success(res, "Warehouses retrieved successfully", result);
+  });
+
+  getWarehouse = asyncHandler(async (req: Request, res: Response) => {
+    const tenantId = req.user?.tenantId;
+    const { id } = req.params;
+
+    if (!tenantId) {
+      return res.status(STATUS_CODES.FORBIDDEN).json({
+        success: false,
+        message: "Tenant ID not found in request",
+      });
+    }
+
+    const warehouse = await this._getWarehouseUC.execute({
+      warehouseId: id,
+      tenantId,
+    });
+
+    ResponseHelper.success(res, "Warehouse retrieved successfully", warehouse);
+  });
+
+  updateWarehouseStatus = asyncHandler(async (req: Request, res: Response) => {
+    const tenantId = req.user?.tenantId;
+    const { id } = req.params;
+
+    if (!tenantId) {
+      return res.status(STATUS_CODES.FORBIDDEN).json({
+        success: false,
+        message: "Tenant ID not found in request",
+      });
+    }
+
+    await this._updateWarehouseStatusUC.execute({
+      warehouseId: id,
+      tenantId,
+      status: req.body.status,
+    });
+
+    ResponseHelper.success(res, "Warehouse status updated successfully");
   });
 }
