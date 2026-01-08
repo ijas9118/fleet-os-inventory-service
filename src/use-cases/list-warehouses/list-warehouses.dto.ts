@@ -17,6 +17,7 @@ export interface ListWarehousesParams {
   limit: number;
   search?: string;
   status?: string;
+  includeArchived?: boolean;
 }
 
 export interface PaginatedWarehousesResponse {

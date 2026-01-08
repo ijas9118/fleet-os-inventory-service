@@ -14,6 +14,7 @@ export class ListWarehousesUseCase {
       limit: params.limit,
       search: params.search,
       status: params.status,
+      includeArchived: params.includeArchived,
     });
 
     const totalPages = Math.ceil(total / params.limit);

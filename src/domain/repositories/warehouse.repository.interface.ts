@@ -6,6 +6,7 @@ export interface ListWarehousesOptions {
   limit: number;
   search?: string;
   status?: string;
+  includeArchived?: boolean;
 }
 
 export interface IWareHouseRepository {

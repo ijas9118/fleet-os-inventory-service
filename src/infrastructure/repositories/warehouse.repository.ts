@@ -26,6 +26,7 @@ export class WarehouseRepository implements IWareHouseRepository {
           : undefined,
       },
       status: doc.status,
+      deletedAt: doc.deletedAt ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
@@ -71,10 +72,14 @@ export class WarehouseRepository implements IWareHouseRepository {
   }
 
   async listWarehouses(options: ListWarehousesOptions): Promise<{ warehouses: Warehouse[]; total: number }> {
-    const { tenantId, page, limit, search, status } = options;
+    const { tenantId, page, limit, search, status, includeArchived } = options;
 
-    // Build query
+    // Build query - exclude archived warehouses by default unless includeArchived is true
     const query: any = { tenantId };
+
+    if (!includeArchived) {
+      query.deletedAt = null;
+    }
 
     // Filter by status if provided
     if (status) {

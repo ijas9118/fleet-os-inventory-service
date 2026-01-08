@@ -2,14 +2,14 @@ import type { IWareHouseRepository } from "@/domain/repositories/warehouse.repos
 
 import { WarehouseArchivedError, WarehouseNotFoundError } from "@/domain/errors";
 
-import type { UpdateWarehouseStatusDTO } from "./update-warehouse-status.dto";
+import type { UpdateWarehouseDTO } from "./update-warehouse.dto";
 
-export class UpdateWarehouseStatusUseCase {
+export class UpdateWarehouseUseCase {
   constructor(
     private _warehouseRepo: IWareHouseRepository,
   ) {}
 
-  async execute(dto: UpdateWarehouseStatusDTO): Promise<void> {
+  async execute(dto: UpdateWarehouseDTO): Promise<void> {
     // Find warehouse and verify tenant ownership
     const warehouse = await this._warehouseRepo.findById(dto.warehouseId, dto.tenantId);
 
@@ -17,18 +17,17 @@ export class UpdateWarehouseStatusUseCase {
       throw new WarehouseNotFoundError(dto.warehouseId);
     }
 
-    // Prevent status changes on archived warehouses
+    // Prevent editing archived warehouses
     if (warehouse.status === "ARCHIVED") {
       throw new WarehouseArchivedError(dto.warehouseId);
     }
 
-    // Update status
-    warehouse.updateStatus(dto.status as any);
-
-    // Save only status and updatedAt to repository (avoid address transformation issues)
+    // Update warehouse properties
     await this._warehouseRepo.updateWarehouse(dto.warehouseId, {
-      status: warehouse.status,
-      updatedAt: warehouse.updatedAt,
+      name: dto.name,
+      code: dto.code,
+      address: dto.address,
+      updatedAt: new Date(),
     });
   }
 }
