@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { CreateWarehouseDTOSchema } from "@/use-cases/create-warehouse/create-warehouse.dto";
-import { updateWarehouseStatusSchema } from "@/use-cases/update-warehouse-status/update-warehouse-status.schema";
-import { updateWarehouseSchema } from "@/use-cases/update-warehouse/update-warehouse.schema";
+import { CreateWarehouseDTOSchema } from "@/use-cases/warehouse/create-warehouse";
+import { updateWarehouseSchema } from "@/use-cases/warehouse/update-warehouse";
+import { updateWarehouseStatusSchema } from "@/use-cases/warehouse/update-warehouse-status";
 
 import type { WarehouseController } from "../controllers/warehouse.controller";
 

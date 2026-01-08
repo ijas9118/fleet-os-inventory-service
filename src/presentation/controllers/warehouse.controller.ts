@@ -2,12 +2,12 @@ import type { Request, Response } from "express";
 
 import { STATUS_CODES } from "@ahammedijas/fleet-os-shared";
 
-import type { ArchiveWarehouseUseCase } from "@/use-cases/archive-warehouse/archive-warehouse.usecase";
-import type { CreateWarehouseUseCase } from "@/use-cases/create-warehouse/create-warehouse.usecase";
-import type { GetWarehouseUseCase } from "@/use-cases/get-warehouse/get-warehouse.usecase";
-import type { ListWarehousesUseCase } from "@/use-cases/list-warehouses/list-warehouses.usecase";
-import type { UpdateWarehouseStatusUseCase } from "@/use-cases/update-warehouse-status/update-warehouse-status.usecase";
-import type { UpdateWarehouseUseCase } from "@/use-cases/update-warehouse/update-warehouse.usecase";
+import type { ArchiveWarehouseUseCase } from "@/use-cases/warehouse/archive-warehouse";
+import type { CreateWarehouseUseCase } from "@/use-cases/warehouse/create-warehouse";
+import type { GetWarehouseUseCase } from "@/use-cases/warehouse/get-warehouse";
+import type { ListWarehousesUseCase } from "@/use-cases/warehouse/list-warehouses";
+import type { UpdateWarehouseUseCase } from "@/use-cases/warehouse/update-warehouse";
+import type { UpdateWarehouseStatusUseCase } from "@/use-cases/warehouse/update-warehouse-status";
 
 import { asyncHandler } from "../utils/async-handler";
 import { RequestHelper } from "../utils/request.helper";
