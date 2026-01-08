@@ -6,6 +6,7 @@ import type { CreateWarehouseUseCase } from "@/use-cases/create-warehouse/create
 import type { ListWarehousesUseCase } from "@/use-cases/list-warehouses/list-warehouses.usecase";
 
 import { asyncHandler } from "../utils/async-handler";
+import { RequestHelper } from "../utils/request.helper";
 import { ResponseHelper } from "../utils/response.helper";
 
 export class WarehouseController {
@@ -45,9 +46,16 @@ export class WarehouseController {
 
   listWarehouses = asyncHandler(async (req: Request, res: Response) => {
     const tenantId = req.user?.tenantId as string;
+    const { page, limit, search, status } = RequestHelper.parsePaginationParams(req.query);
 
-    const warehousesList = await this._listWarehousesUC.execute(tenantId);
+    const result = await this._listWarehousesUC.execute({
+      tenantId,
+      page,
+      limit,
+      search,
+      status,
+    });
 
-    ResponseHelper.success(res, "Warehouses retrieved successfully", warehousesList);
+    ResponseHelper.success(res, "Warehouses retrieved successfully", result);
   });
 }

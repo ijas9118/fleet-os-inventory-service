@@ -1,44 +1,39 @@
 import type { IWareHouseRepository } from "@/domain/repositories";
-import type { ICacheRepository } from "@/infrastructure/cache/cache.repository";
 
-import type { ListWarehousesDTO } from "./list-warehouses.dto";
-
-const TTL_SECONDS = 3600;
+import type { ListWarehousesParams, PaginatedWarehousesResponse } from "./list-warehouses.dto";
 
 export class ListWarehousesUseCase {
   constructor(
     private _warehouseRepo: IWareHouseRepository,
-    private _cache?: ICacheRepository,
   ) {}
 
-  private _makeKey(tenantId: string): string {
-    return `warehouses:${tenantId}`;
-  }
+  async execute(params: ListWarehousesParams): Promise<PaginatedWarehousesResponse> {
+    const { warehouses, total } = await this._warehouseRepo.listWarehouses({
+      tenantId: params.tenantId,
+      page: params.page,
+      limit: params.limit,
+      search: params.search,
+      status: params.status,
+    });
 
-  async execute(tenantId: string): Promise<ListWarehousesDTO[]> {
-    const cacheKey = this._makeKey(tenantId);
+    const totalPages = Math.ceil(total / params.limit);
 
-    if (this._cache) {
-      const cached = await this._cache.get<ListWarehousesDTO[]>(cacheKey);
-      if (cached)
-        return cached;
-    }
-
-    const warehouses = await this._warehouseRepo.listWarehouses(tenantId);
-
-    const result = warehouses.map(w => ({
-      id: w.id!,
-      code: w.code,
-      name: w.name,
-      address: w.address,
-      status: w.status,
-      createdAt: w.createdAt,
-      updatedAt: w.updatedAt,
-    }));
-
-    if (this._cache)
-      await this._cache.set(cacheKey, result, TTL_SECONDS);
-
-    return result;
+    return {
+      data: warehouses.map(w => ({
+        id: w.id!,
+        code: w.code,
+        name: w.name,
+        address: w.address,
+        status: w.status,
+        createdAt: w.createdAt,
+        updatedAt: w.updatedAt,
+      })),
+      meta: {
+        page: params.page,
+        limit: params.limit,
+        total,
+        totalPages,
+      },
+    };
   }
 }

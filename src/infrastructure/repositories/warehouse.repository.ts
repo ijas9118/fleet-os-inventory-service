@@ -1,5 +1,5 @@
 import type { Warehouse, WarehouseProps } from "@/domain/entities";
-import type { IWareHouseRepository } from "@/domain/repositories";
+import type { IWareHouseRepository, ListWarehousesOptions } from "@/domain/repositories";
 
 import { Warehouse as WarehouseEntity } from "@/domain/entities";
 import { WarehouseStatus } from "@/domain/enums";
@@ -71,12 +71,47 @@ export class WarehouseRepository implements IWareHouseRepository {
     return this._mapToEntity(found);
   }
 
-  async listWarehouses(tenantId: string): Promise<Warehouse[]> {
-    const results = await WarehouseModel.find({
-      tenantId,
-      status: WarehouseStatus.ACTIVE,
-    }).lean();
+  async listWarehouses(options: ListWarehousesOptions): Promise<{ warehouses: Warehouse[]; total: number }> {
+    const { tenantId, page, limit, search, status } = options;
 
-    return results.map(doc => this._mapToEntity(doc));
+    // Build query
+    const query: any = { tenantId };
+
+    // Filter by status if provided
+    if (status) {
+      query.status = status;
+    }
+    else {
+      // Default: only show ACTIVE warehouses if no status filter
+      query.status = WarehouseStatus.ACTIVE;
+    }
+
+    // Add search filter if provided
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { code: { $regex: search, $options: "i" } },
+        { "address.city": { $regex: search, $options: "i" } },
+        { "address.country": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Calculate skip
+    const skip = (page - 1) * limit;
+
+    // Execute query with pagination
+    const [warehouses, total] = await Promise.all([
+      WarehouseModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      WarehouseModel.countDocuments(query),
+    ]);
+
+    return {
+      warehouses: warehouses.map(doc => this._mapToEntity(doc)),
+      total,
+    };
   }
 }

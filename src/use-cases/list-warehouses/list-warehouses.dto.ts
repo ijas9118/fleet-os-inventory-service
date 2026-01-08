@@ -10,3 +10,21 @@ export interface ListWarehousesDTO {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface ListWarehousesParams {
+  tenantId: string;
+  page: number;
+  limit: number;
+  search?: string;
+  status?: string;
+}
+
+export interface PaginatedWarehousesResponse {
+  data: ListWarehousesDTO[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}

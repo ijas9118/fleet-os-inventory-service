@@ -1,10 +1,17 @@
 import type { Warehouse, WarehouseProps } from "../entities";
 
+export interface ListWarehousesOptions {
+  tenantId: string;
+  page: number;
+  limit: number;
+  search?: string;
+  status?: string;
+}
+
 export interface IWareHouseRepository {
   createWarehouse: (props: WarehouseProps) => Promise<Warehouse>;
   findByCode: (code: string, tenantId: string) => Promise<Warehouse | null>;
-  listWarehouses: (tenantId: string) => Promise<Warehouse[]>;
+  listWarehouses: (options: ListWarehousesOptions) => Promise<{ warehouses: Warehouse[]; total: number }>;
   // getWarehouse: (warehouseId: string, tenantId: string) => Promise<Warehouse | null>;
-  // listWarehouses: (tenantId: string, assignedManagerUserId?: string) => Promise<Warehouse[]>;
   // updateWarehouse: (warehouseId: string, updates: Partial<WarehouseProps>) => Promise<Warehouse>;
 }

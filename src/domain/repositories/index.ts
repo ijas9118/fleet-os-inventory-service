@@ -1,1 +1,1 @@
-export { IWareHouseRepository } from "./warehouse.repository.interface";
+export { IWareHouseRepository, type ListWarehousesOptions } from "./warehouse.repository.interface";
