@@ -1,22 +1,19 @@
-import { InvalidReservationStatusTransitionError, WarehouseCodeAlreadyExistsError } from "@/domain/errors";
+import { WarehouseCodeAlreadyExistsError, WarehouseNotFoundError } from "@/domain/errors";
 
-import {
-  AppError,
-  BadRequestError,
-  ConflictError,
-  // ForbiddenError,
-  // NotFoundError,
-} from "../errors";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 
-export function mapToHttpError(err: unknown): AppError {
-  if (err instanceof InvalidReservationStatusTransitionError)
-    return new BadRequestError(err.message);
-
-  if (err instanceof WarehouseCodeAlreadyExistsError)
+export function mapToHttpError(err: unknown) {
+  if (err instanceof WarehouseCodeAlreadyExistsError) {
     return new ConflictError(err.message);
+  }
 
-  if (err instanceof AppError)
-    return err;
+  if (err instanceof WarehouseNotFoundError) {
+    return new NotFoundError(err.message);
+  }
 
-  return new AppError("Internal Server Error");
+  if (err instanceof Error) {
+    return new BadRequestError(err.message);
+  }
+
+  return new BadRequestError("Unknown error occurred");
 }

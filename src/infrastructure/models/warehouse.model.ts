@@ -30,16 +30,10 @@ const WarehouseSchema = new Schema({
   code: {
     type: String,
     required: true,
-    unique: true,
-    index: true,
   }, // WH001
   address: {
     type: AddressSchema,
     required: true,
-  },
-  assignedManagerUserId: {
-    type: String,
-    ref: "User",
   },
   status: {
     type: String,
@@ -49,5 +43,11 @@ const WarehouseSchema = new Schema({
 }, {
   timestamps: true,
 });
+
+// Compound unique index: code must be unique per tenant
+WarehouseSchema.index({ tenantId: 1, code: 1 }, { unique: true });
+
+// Optional: Geospatial index for location-based queries
+WarehouseSchema.index({ "address.coordinates": "2dsphere" });
 
 export const WarehouseModel = model("Warehouse", WarehouseSchema);

@@ -1,8 +1,8 @@
-import type { Warehouse, WarehouseProps } from "../entities/warehouse.entity";
+import type { Warehouse, WarehouseProps } from "../entities";
 
 export interface IWareHouseRepository {
   createWarehouse: (props: WarehouseProps) => Promise<Warehouse>;
-  findByCode: (code: string) => Promise<Warehouse | null>;
+  findByCode: (code: string, tenantId: string) => Promise<Warehouse | null>;
   listWarehouses: (tenantId: string) => Promise<Warehouse[]>;
   // getWarehouse: (warehouseId: string, tenantId: string) => Promise<Warehouse | null>;
   // listWarehouses: (tenantId: string, assignedManagerUserId?: string) => Promise<Warehouse[]>;

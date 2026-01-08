@@ -18,7 +18,7 @@ export class CreateWarehouseUseCase {
   }
 
   async execute(dto: CreateWarehouseDTO): Promise<Warehouse> {
-    const existing = await this._warehouseRepo.findByCode(dto.code.toUpperCase());
+    const existing = await this._warehouseRepo.findByCode(dto.code.toUpperCase(), dto.tenantId);
 
     if (existing) {
       throw new WarehouseCodeAlreadyExistsError(dto.code);
@@ -27,13 +27,12 @@ export class CreateWarehouseUseCase {
     const warehouse = new Warehouse({
       tenantId: dto.tenantId,
       name: dto.name,
-      code: dto.code,
+      code: dto.code.toUpperCase(),
       address: dto.address,
-      assignedManagerUserId: dto.assignedManagerUserId,
       status: WarehouseStatus.ACTIVE,
     });
 
-    const result = this._warehouseRepo.createWarehouse(warehouse.propsSnapshot);
+    const result = await this._warehouseRepo.createWarehouse(warehouse.propsSnapshot);
 
     if (this._cache)
       await this._cache.delete(this._makeKey(dto.tenantId));

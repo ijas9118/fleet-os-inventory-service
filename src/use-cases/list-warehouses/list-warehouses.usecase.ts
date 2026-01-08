@@ -30,6 +30,10 @@ export class ListWarehousesUseCase {
       id: w.id!,
       code: w.code,
       name: w.name,
+      address: w.address,
+      status: w.status,
+      createdAt: w.createdAt,
+      updatedAt: w.updatedAt,
     }));
 
     if (this._cache)
