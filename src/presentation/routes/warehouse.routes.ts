@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { CreateWarehouseDTOSchema } from "@/use-cases/create-warehouse/create-warehouse.dto";
+import { updateWarehouseStatusSchema } from "@/use-cases/update-warehouse-status/update-warehouse-status.schema";
 
 import type { WarehouseController } from "../controllers/warehouse.controller";
 
@@ -13,6 +14,8 @@ export function buildWarehouseRoutes(controller: WarehouseController): Router {
 
   router.post("/", validate(CreateWarehouseDTOSchema), controller.createWarehouse);
   router.get("/", controller.listWarehouses);
+  router.get("/:id", controller.getWarehouse);
+  router.patch("/:id/status", validate(updateWarehouseStatusSchema), controller.updateWarehouseStatus);
 
   return router;
 }

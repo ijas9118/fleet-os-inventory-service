@@ -11,7 +11,7 @@ export interface ListWarehousesOptions {
 export interface IWareHouseRepository {
   createWarehouse: (props: WarehouseProps) => Promise<Warehouse>;
   findByCode: (code: string, tenantId: string) => Promise<Warehouse | null>;
+  findById: (warehouseId: string, tenantId: string) => Promise<Warehouse | null>;
   listWarehouses: (options: ListWarehousesOptions) => Promise<{ warehouses: Warehouse[]; total: number }>;
-  // getWarehouse: (warehouseId: string, tenantId: string) => Promise<Warehouse | null>;
-  // updateWarehouse: (warehouseId: string, updates: Partial<WarehouseProps>) => Promise<Warehouse>;
+  updateWarehouse: (warehouseId: string, updates: Partial<WarehouseProps>) => Promise<Warehouse>;
 }

@@ -2,7 +2,6 @@ import type { Warehouse, WarehouseProps } from "@/domain/entities";
 import type { IWareHouseRepository, ListWarehousesOptions } from "@/domain/repositories";
 
 import { Warehouse as WarehouseEntity } from "@/domain/entities";
-import { WarehouseStatus } from "@/domain/enums";
 
 import { WarehouseModel } from "../models/warehouse.model";
 
@@ -81,10 +80,6 @@ export class WarehouseRepository implements IWareHouseRepository {
     if (status) {
       query.status = status;
     }
-    else {
-      // Default: only show ACTIVE warehouses if no status filter
-      query.status = WarehouseStatus.ACTIVE;
-    }
 
     // Add search filter if provided
     if (search) {
@@ -113,5 +108,47 @@ export class WarehouseRepository implements IWareHouseRepository {
       warehouses: warehouses.map(doc => this._mapToEntity(doc)),
       total,
     };
+  }
+
+  async findById(warehouseId: string, tenantId: string): Promise<Warehouse | null> {
+    const found = await WarehouseModel.findOne({ _id: warehouseId, tenantId }).lean();
+
+    if (!found)
+      return null;
+
+    return this._mapToEntity(found);
+  }
+
+  async updateWarehouse(warehouseId: string, updates: Partial<WarehouseProps>): Promise<Warehouse> {
+    // Transform address coordinates to GeoJSON format if address is being updated
+    const mongoUpdates: any = { ...updates };
+
+    if (updates.address) {
+      mongoUpdates.address = {
+        line1: updates.address.line1,
+        city: updates.address.city,
+        state: updates.address.state,
+        postalCode: updates.address.postalCode,
+        country: updates.address.country,
+        coordinates: updates.address.coordinates
+          ? {
+              type: "Point",
+              coordinates: [updates.address.coordinates.lng, updates.address.coordinates.lat],
+            }
+          : undefined,
+      };
+    }
+
+    const updated = await WarehouseModel.findByIdAndUpdate(
+      warehouseId,
+      { $set: mongoUpdates },
+      { new: true },
+    ).lean();
+
+    if (!updated) {
+      throw new Error("Warehouse not found");
+    }
+
+    return this._mapToEntity(updated);
   }
 }

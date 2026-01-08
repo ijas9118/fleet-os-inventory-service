@@ -129,6 +129,11 @@ export class Warehouse {
     this._props.status = "CLOSED" as WarehouseStatus;
   }
 
+  updateStatus(newStatus: WarehouseStatus): void {
+    this._props.status = newStatus;
+    this._props.updatedAt = new Date();
+  }
+
   updateDetails(updates: {
     name?: string;
     address?: Address;
