@@ -61,6 +61,7 @@ export class InventoryItemController {
     const tenantId = req.user?.tenantId as string;
     const { page, limit, search, status } = RequestHelper.parsePaginationParams(req.query);
     const category = req.query.category as string | undefined;
+    const includeArchived = req.query.includeArchived === "true";
 
     const result = await this._listInventoryItemsUC.execute({
       tenantId,
@@ -69,6 +70,7 @@ export class InventoryItemController {
       search,
       status,
       category,
+      includeArchived,
     });
 
     ResponseHelper.success(res, "Inventory items retrieved successfully", result);

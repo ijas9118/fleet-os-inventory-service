@@ -65,10 +65,15 @@ export class InventoryItemRepository implements IInventoryItemRepository {
   }
 
   async list(options: ListInventoryItemsOptions): Promise<{ items: InventoryItem[]; total: number }> {
-    const { tenantId, page, limit, search, category, status } = options;
+    const { tenantId, page, limit, search, category, status, includeArchived } = options;
 
     // Build query
-    const query: any = { tenantId, deletedAt: null };
+    const query: any = { tenantId };
+
+    // Filter out archived items by default (only show if explicitly requested)
+    if (!includeArchived) {
+      query.deletedAt = null;
+    }
 
     if (search) {
       query.$text = { $search: search };
@@ -130,7 +135,7 @@ export class InventoryItemRepository implements IInventoryItemRepository {
       { _id: id },
       {
         $set: {
-          status: "DISCONTINUED",
+          status: "ARCHIVED",
           deletedAt: new Date(),
           updatedAt: new Date(),
         },

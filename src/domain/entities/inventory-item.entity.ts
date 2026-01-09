@@ -139,7 +139,7 @@ export class InventoryItem {
   }
 
   archive(): void {
-    this._props.status = "DISCONTINUED" as InventoryItemStatus;
+    this._props.status = "ARCHIVED" as InventoryItemStatus;
     this._props.deletedAt = new Date();
     this._props.updatedAt = new Date();
   }

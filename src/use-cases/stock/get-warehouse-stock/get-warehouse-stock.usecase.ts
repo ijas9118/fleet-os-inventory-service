@@ -8,13 +8,31 @@ export class GetWarehouseStockUseCase {
     private _stockRepo: IStockRepository,
   ) {}
 
-  async execute(dto: GetWarehouseStockDTO): Promise<{ items: Stock[]; total: number }> {
-    const result = await this._stockRepo.findByWarehouse(
+  async execute(dto: GetWarehouseStockDTO): Promise<{
+    data: Stock[];
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    const { items, total } = await this._stockRepo.findByWarehouse(
       dto.warehouseId,
       dto.tenantId,
       { page: dto.page, limit: dto.limit },
     );
 
-    return result;
+    const totalPages = Math.ceil(total / dto.limit);
+
+    return {
+      data: items,
+      meta: {
+        page: dto.page,
+        limit: dto.limit,
+        total,
+        totalPages,
+      },
+    };
   }
 }

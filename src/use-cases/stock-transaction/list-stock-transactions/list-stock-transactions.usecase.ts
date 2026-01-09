@@ -8,8 +8,16 @@ export class ListStockTransactionsUseCase {
     private _transactionRepo: IStockTransactionRepository,
   ) {}
 
-  async execute(dto: ListStockTransactionsDTO): Promise<{ items: StockTransaction[]; total: number }> {
-    const result = await this._transactionRepo.list({
+  async execute(dto: ListStockTransactionsDTO): Promise<{
+    data: StockTransaction[];
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    const { items, total } = await this._transactionRepo.list({
       tenantId: dto.tenantId,
       page: dto.page,
       limit: dto.limit,
@@ -20,6 +28,16 @@ export class ListStockTransactionsUseCase {
       endDate: dto.endDate,
     });
 
-    return result;
+    const totalPages = Math.ceil(total / dto.limit);
+
+    return {
+      data: items,
+      meta: {
+        page: dto.page,
+        limit: dto.limit,
+        total,
+        totalPages,
+      },
+    };
   }
 }

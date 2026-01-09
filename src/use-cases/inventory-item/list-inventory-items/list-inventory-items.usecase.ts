@@ -8,7 +8,7 @@ export class ListInventoryItemsUseCase {
   ) {}
 
   async execute(dto: ListInventoryItemsDTO): Promise<{
-    items: Array<{
+    data: Array<{
       id: string;
       tenantId: string;
       sku: string;
@@ -23,9 +23,12 @@ export class ListInventoryItemsUseCase {
       createdAt?: Date;
       updatedAt?: Date;
     }>;
-    total: number;
-    page: number;
-    totalPages: number;
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   }> {
     const { items, total } = await this._inventoryItemRepo.list({
       tenantId: dto.tenantId,
@@ -34,12 +37,13 @@ export class ListInventoryItemsUseCase {
       search: dto.search,
       category: dto.category,
       status: dto.status,
+      includeArchived: dto.includeArchived,
     });
 
     const totalPages = Math.ceil(total / dto.limit);
 
     return {
-      items: items.map(item => ({
+      data: items.map(item => ({
         id: item.id!,
         tenantId: item.tenantId,
         sku: item.sku,
@@ -54,9 +58,12 @@ export class ListInventoryItemsUseCase {
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       })),
-      total,
-      page: dto.page,
-      totalPages,
+      meta: {
+        page: dto.page,
+        limit: dto.limit,
+        total,
+        totalPages,
+      },
     };
   }
 }

@@ -35,7 +35,7 @@ export class StockTransactionController {
       endDate,
     });
 
-    const formattedItems = result.items.map(transaction => ({
+    const formattedItems = result.data.map(transaction => ({
       id: transaction.id,
       tenantId: transaction.tenantId,
       warehouseId: transaction.warehouseId,
@@ -49,8 +49,8 @@ export class StockTransactionController {
     }));
 
     ResponseHelper.success(res, "Stock transactions retrieved successfully", {
-      items: formattedItems,
-      total: result.total,
+      data: formattedItems,
+      meta: result.meta,
     });
   });
 

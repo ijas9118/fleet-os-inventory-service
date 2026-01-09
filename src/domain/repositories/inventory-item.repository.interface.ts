@@ -7,6 +7,7 @@ export interface ListInventoryItemsOptions {
   search?: string;
   category?: string;
   status?: string;
+  includeArchived?: boolean;
 }
 
 export interface IInventoryItemRepository {

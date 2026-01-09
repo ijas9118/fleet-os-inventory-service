@@ -69,7 +69,7 @@ export class StockController {
       inventoryItemId,
     });
 
-    const formattedItems = result.items.map(stock => ({
+    const formattedItems = result.data.map(stock => ({
       id: stock.id,
       tenantId: stock.tenantId,
       warehouseId: stock.warehouseId,
@@ -80,8 +80,8 @@ export class StockController {
     }));
 
     ResponseHelper.success(res, "Stock records retrieved successfully", {
-      items: formattedItems,
-      total: result.total,
+      data: formattedItems,
+      meta: result.meta,
     });
   });
 
@@ -131,7 +131,7 @@ export class StockController {
       limit,
     });
 
-    const formattedItems = result.items.map(stock => ({
+    const formattedItems = result.data.map(stock => ({
       id: stock.id,
       tenantId: stock.tenantId,
       warehouseId: stock.warehouseId,
@@ -142,8 +142,8 @@ export class StockController {
     }));
 
     ResponseHelper.success(res, "Warehouse stock retrieved successfully", {
-      items: formattedItems,
-      total: result.total,
+      data: formattedItems,
+      meta: result.meta,
     });
   });
 

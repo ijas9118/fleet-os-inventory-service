@@ -5,4 +5,5 @@ export interface ListInventoryItemsDTO {
   search?: string;
   category?: string;
   status?: string;
+  includeArchived?: boolean;
 }
