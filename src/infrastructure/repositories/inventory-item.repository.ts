@@ -85,7 +85,11 @@ export class InventoryItemRepository implements IInventoryItemRepository {
     // Execute query
     const skip = (page - 1) * limit;
     const [docs, total] = await Promise.all([
-      InventoryItemModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      InventoryItemModel.find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .lean(),
       InventoryItemModel.countDocuments(query),
     ]);
 
