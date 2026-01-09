@@ -1,4 +1,1 @@
-export enum InventoryItemStatus {
-  ACTIVE = "ACTIVE",
-  DISCONTINUED = "DISCONTINUED",
-}
+export { InventoryItemStatus } from "@ahammedijas/fleet-os-shared";
