@@ -1,4 +1,4 @@
-import type { Stock } from "@/domain/entities";
+import type { StockResponseDTO } from "@/domain/dtos";
 import type { IStockRepository, IStockTransactionRepository } from "@/domain/repositories";
 
 import { Stock as StockEntity, StockTransaction } from "@/domain/entities";
@@ -12,7 +12,7 @@ export class AdjustStockUseCase {
     private _transactionRepo: IStockTransactionRepository,
   ) {}
 
-  async execute(dto: AdjustStockDTO): Promise<Stock> {
+  async execute(dto: AdjustStockDTO): Promise<StockResponseDTO> {
     // Find or create stock record
     let stock = await this._stockRepo.findByWarehouseAndItem(
       dto.warehouseId,

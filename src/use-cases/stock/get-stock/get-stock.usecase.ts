@@ -1,4 +1,4 @@
-import type { Stock } from "@/domain/entities";
+import type { StockResponseDTO } from "@/domain/dtos";
 import type { IStockRepository } from "@/domain/repositories";
 
 import { StockNotFoundError } from "@/domain/errors";
@@ -10,7 +10,7 @@ export class GetStockUseCase {
     private _stockRepo: IStockRepository,
   ) {}
 
-  async execute(dto: GetStockDTO): Promise<Stock> {
+  async execute(dto: GetStockDTO): Promise<StockResponseDTO> {
     const stock = await this._stockRepo.findById(dto.id, dto.tenantId);
 
     if (!stock) {

@@ -1,4 +1,4 @@
-import type { Stock } from "@/domain/entities";
+import type { StockResponseDTO } from "@/domain/dtos";
 import type { IStockRepository, IStockTransactionRepository } from "@/domain/repositories";
 
 import { StockTransaction } from "@/domain/entities";
@@ -13,7 +13,7 @@ export class RemoveStockUseCase {
     private _transactionRepo: IStockTransactionRepository,
   ) {}
 
-  async execute(dto: RemoveStockDTO): Promise<Stock> {
+  async execute(dto: RemoveStockDTO): Promise<StockResponseDTO> {
     // Find stock record
     const stock = await this._stockRepo.findByWarehouseAndItem(
       dto.warehouseId,

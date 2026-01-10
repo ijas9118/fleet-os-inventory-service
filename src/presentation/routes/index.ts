@@ -12,7 +12,7 @@ export function buildRoutes(controllers: ReturnType<typeof buildContainer>) {
 
   router.use("/warehouses", buildWarehouseRoutes(controllers.warehouseController));
   router.use("/inventory-items", buildInventoryItemRoutes(controllers.inventoryItemController));
-  router.use("/stock", buildStockRoutes(controllers.stockController));
+  router.use("/stocks", buildStockRoutes(controllers.stockController));
   router.use("/stock-transactions", buildStockTransactionRoutes(controllers.stockTransactionController));
 
   return router;

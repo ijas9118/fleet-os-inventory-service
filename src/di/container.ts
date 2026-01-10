@@ -54,7 +54,11 @@ export function buildContainer() {
   const archiveInventoryItemUC = new ArchiveInventoryItemUseCase(inventoryItemRepo);
 
   // Stock
-  const createStockRecordUC = new CreateStockRecordUseCase(stockRepo);
+  const createStockRecordUC = new CreateStockRecordUseCase(
+    stockRepo,
+    warehouseRepo,
+    inventoryItemRepo,
+  );
   const listStockUC = new ListStockUseCase(stockRepo);
   const getStockUC = new GetStockUseCase(stockRepo);
   const getWarehouseStockUC = new GetWarehouseStockUseCase(stockRepo);

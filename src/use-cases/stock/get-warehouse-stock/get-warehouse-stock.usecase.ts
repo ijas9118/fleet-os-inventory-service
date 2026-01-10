@@ -1,4 +1,4 @@
-import type { Stock } from "@/domain/entities";
+import type { StockResponseDTO } from "@/domain/dtos";
 import type { IStockRepository } from "@/domain/repositories";
 
 import type { GetWarehouseStockDTO } from "./get-warehouse-stock.dto";
@@ -9,7 +9,7 @@ export class GetWarehouseStockUseCase {
   ) {}
 
   async execute(dto: GetWarehouseStockDTO): Promise<{
-    data: Stock[];
+    data: StockResponseDTO[];
     meta: {
       page: number;
       limit: number;

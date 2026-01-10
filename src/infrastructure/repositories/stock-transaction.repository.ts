@@ -1,3 +1,6 @@
+import { Types } from "mongoose";
+
+import type { StockTransactionResponseDTO } from "@/domain/dtos";
 import type { StockTransaction } from "@/domain/entities";
 import type { IStockTransactionRepository, ListStockTransactionsOptions } from "@/domain/repositories";
 
@@ -21,6 +24,74 @@ export class StockTransactionRepository implements IStockTransactionRepository {
     });
   }
 
+  private _mapToDTO(doc: any): StockTransactionResponseDTO {
+    return {
+      id: doc._id.toString(),
+      tenantId: doc.tenantId.toString(),
+      warehouseId: doc.warehouseId.toString(),
+      warehouse: {
+        id: doc.warehouse?._id?.toString() || doc.warehouseId.toString(),
+        name: doc.warehouse?.name || "Unknown",
+        code: doc.warehouse?.code || "N/A",
+        status: doc.warehouse?.status || "unknown",
+      },
+      inventoryItemId: doc.inventoryItemId.toString(),
+      inventoryItem: {
+        id: doc.inventoryItem?._id?.toString() || doc.inventoryItemId.toString(),
+        sku: doc.inventoryItem?.sku || "Unknown",
+        name: doc.inventoryItem?.name || "Unknown",
+        category: doc.inventoryItem?.category,
+        unit: doc.inventoryItem?.unit || "unit",
+      },
+      type: doc.type,
+      quantity: doc.quantity,
+      notes: doc.notes,
+      referenceId: doc.referenceId,
+      relatedTransactionId: doc.relatedTransactionId,
+      createdAt: doc.createdAt,
+    };
+  }
+
+  private _buildLookupPipeline(matchStage: any): any[] {
+    return [
+      { $match: matchStage },
+      // Convert string IDs to ObjectIds for lookup
+      {
+        $addFields: {
+          warehouseObjectId: { $toObjectId: "$warehouseId" },
+          inventoryItemObjectId: { $toObjectId: "$inventoryItemId" },
+        },
+      },
+      // Lookup warehouse using the ObjectId
+      {
+        $lookup: {
+          from: "warehouses",
+          localField: "warehouseObjectId",
+          foreignField: "_id",
+          as: "warehouse",
+        },
+      },
+      { $unwind: { path: "$warehouse", preserveNullAndEmptyArrays: true } },
+      // Lookup inventory item using the ObjectId
+      {
+        $lookup: {
+          from: "inventoryitems",
+          localField: "inventoryItemObjectId",
+          foreignField: "_id",
+          as: "inventoryItem",
+        },
+      },
+      { $unwind: { path: "$inventoryItem", preserveNullAndEmptyArrays: true } },
+      // Remove temporary ObjectId fields
+      {
+        $project: {
+          warehouseObjectId: 0,
+          inventoryItemObjectId: 0,
+        },
+      },
+    ];
+  }
+
   async create(transaction: StockTransaction): Promise<StockTransaction> {
     const props = transaction.propsSnapshot;
 
@@ -38,28 +109,30 @@ export class StockTransactionRepository implements IStockTransactionRepository {
     return this._mapToEntity(created);
   }
 
-  async findById(id: string, tenantId: string): Promise<StockTransaction | null> {
-    const doc = await StockTransactionModel.findOne({ _id: id, tenantId });
+  async findById(id: string, tenantId: string): Promise<StockTransactionResponseDTO | null> {
+    const pipeline = this._buildLookupPipeline({ _id: new Types.ObjectId(id), tenantId });
+
+    const [doc] = await StockTransactionModel.aggregate(pipeline);
 
     if (!doc) {
       return null;
     }
 
-    return this._mapToEntity(doc);
+    return this._mapToDTO(doc);
   }
 
-  async findByReference(referenceId: string, tenantId: string): Promise<StockTransaction[]> {
-    const docs = await StockTransactionModel.find({
-      tenantId,
-      referenceId,
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+  async findByReference(referenceId: string, tenantId: string): Promise<StockTransactionResponseDTO[]> {
+    const pipeline = [
+      ...this._buildLookupPipeline({ tenantId, referenceId }),
+      { $sort: { createdAt: -1 } },
+    ];
 
-    return docs.map(doc => this._mapToEntity(doc));
+    const docs = await StockTransactionModel.aggregate(pipeline);
+
+    return docs.map(doc => this._mapToDTO(doc));
   }
 
-  async list(options: ListStockTransactionsOptions): Promise<{ items: StockTransaction[]; total: number }> {
+  async list(options: ListStockTransactionsOptions): Promise<{ items: StockTransactionResponseDTO[]; total: number }> {
     const { tenantId, page, limit, warehouseId, inventoryItemId, type, startDate, endDate } = options;
 
     // Build query
@@ -87,18 +160,22 @@ export class StockTransactionRepository implements IStockTransactionRepository {
       }
     }
 
-    // Execute query
+    // Execute query with aggregation
     const skip = (page - 1) * limit;
+
+    const pipeline = [
+      ...this._buildLookupPipeline(query),
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
     const [docs, total] = await Promise.all([
-      StockTransactionModel.find(query)
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 })
-        .lean(),
+      StockTransactionModel.aggregate(pipeline),
       StockTransactionModel.countDocuments(query),
     ]);
 
-    const items = docs.map(doc => this._mapToEntity(doc));
+    const items = docs.map(doc => this._mapToDTO(doc));
 
     return { items, total };
   }
