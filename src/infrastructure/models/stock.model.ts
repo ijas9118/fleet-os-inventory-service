@@ -22,6 +22,11 @@ const StockSchema = new Schema({
     min: 0,
     default: 0,
   },
+  reservedQuantity: {
+    type: Number,
+    min: 0,
+    default: 0,
+  },
 }, {
   timestamps: true,
 });

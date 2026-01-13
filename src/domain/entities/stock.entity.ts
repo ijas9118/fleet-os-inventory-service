@@ -6,6 +6,7 @@ export interface StockProps {
   warehouseId: string;
   inventoryItemId: string;
   quantity: number;
+  reservedQuantity?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -15,7 +16,10 @@ export class Stock {
 
   constructor(props: StockProps) {
     this._validateProps(props);
-    this._props = { ...props };
+    this._props = {
+      ...props,
+      reservedQuantity: props.reservedQuantity || 0,
+    };
   }
 
   private _validateProps(props: StockProps): void {
@@ -33,6 +37,10 @@ export class Stock {
 
     if (props.quantity < 0) {
       throw new ValidationError("Quantity cannot be negative");
+    }
+
+    if (props.reservedQuantity !== undefined && props.reservedQuantity < 0) {
+      throw new ValidationError("Reserved quantity cannot be negative");
     }
   }
 
@@ -55,6 +63,14 @@ export class Stock {
 
   get quantity(): number {
     return this._props.quantity;
+  }
+
+  get reservedQuantity(): number {
+    return this._props.reservedQuantity || 0;
+  }
+
+  get availableQuantity(): number {
+    return this._props.quantity - (this._props.reservedQuantity || 0);
   }
 
   get createdAt(): Date | undefined {
@@ -85,7 +101,7 @@ export class Stock {
     }
 
     if (this._props.quantity < amount) {
-      throw new InsufficientStockError(this._props.quantity, amount);
+      throw new InsufficientStockError("stock", amount, this._props.quantity);
     }
 
     this._props.quantity -= amount;
@@ -102,6 +118,39 @@ export class Stock {
     }
 
     this._props.quantity = newQuantity;
+    this._props.updatedAt = new Date();
+  }
+
+  // Reservation methods
+  reserve(amount: number): void {
+    if (amount <= 0) {
+      throw new ValidationError("Amount to reserve must be positive");
+    }
+
+    const available = this.availableQuantity;
+    if (available < amount) {
+      throw new ValidationError(
+        `Insufficient available quantity. Available: ${available}, Requested: ${amount}`,
+      );
+    }
+
+    this._props.reservedQuantity = (this._props.reservedQuantity || 0) + amount;
+    this._props.updatedAt = new Date();
+  }
+
+  releaseReserved(amount: number): void {
+    if (amount <= 0) {
+      throw new ValidationError("Amount to release must be positive");
+    }
+
+    const reserved = this._props.reservedQuantity || 0;
+    if (reserved < amount) {
+      throw new ValidationError(
+        `Cannot release more than reserved. Reserved: ${reserved}, Requested: ${amount}`,
+      );
+    }
+
+    this._props.reservedQuantity = reserved - amount;
     this._props.updatedAt = new Date();
   }
 }

@@ -17,7 +17,6 @@ export function buildStockTransactionRoutes(controller: StockTransactionControll
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
     ]),
     controller.listStockTransactions,
   );
@@ -28,7 +27,6 @@ export function buildStockTransactionRoutes(controller: StockTransactionControll
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
     ]),
     controller.getStockTransaction,
   );

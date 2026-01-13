@@ -12,6 +12,12 @@ export interface ListStockOptions {
 export interface IStockRepository {
   create: (stock: Stock) => Promise<Stock>;
   findById: (id: string, tenantId: string) => Promise<StockResponseDTO | null>;
+  // Reservation-specific method that returns entity
+  findByInventoryItemAndWarehouseForReservation: (
+    inventoryItemId: string,
+    warehouseId: string,
+    tenantId: string,
+  ) => Promise<Stock | null>;
   findByWarehouseAndItem: (
     warehouseId: string,
     inventoryItemId: string,

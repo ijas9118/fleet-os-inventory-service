@@ -16,6 +16,7 @@ export class StockRepository implements IStockRepository {
       warehouseId: doc.warehouseId.toString(),
       inventoryItemId: doc.inventoryItemId.toString(),
       quantity: doc.quantity,
+      reservedQuantity: doc.reservedQuantity || 0,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
@@ -94,6 +95,7 @@ export class StockRepository implements IStockRepository {
       warehouseId: props.warehouseId,
       inventoryItemId: props.inventoryItemId,
       quantity: props.quantity,
+      reservedQuantity: props.reservedQuantity || 0,
     });
 
     return this._mapToEntity(created);
@@ -109,6 +111,28 @@ export class StockRepository implements IStockRepository {
     }
 
     return this._mapToDTO(doc);
+  }
+
+  // Reservation-specific method that returns entity (for reservation system)
+  async findByInventoryItemAndWarehouseForReservation(
+    inventoryItemId: string,
+    warehouseId: string,
+    tenantId: string,
+  ): Promise<Stock | null> {
+    const doc = await StockModel.findOne({
+      tenantId,
+      warehouseId,
+      inventoryItemId,
+    });
+
+    if (!doc) {
+      // Let's check if there's ANY stock for this inventory item
+      await StockModel.findOne({ inventoryItemId });
+
+      return null;
+    }
+
+    return this._mapToEntity(doc);
   }
 
   async findByWarehouseAndItem(
@@ -206,6 +230,8 @@ export class StockRepository implements IStockRepository {
 
     if (updates.quantity !== undefined)
       updateData.quantity = updates.quantity;
+    if (updates.reservedQuantity !== undefined)
+      updateData.reservedQuantity = updates.reservedQuantity;
     if (updates.updatedAt !== undefined)
       updateData.updatedAt = updates.updatedAt;
 

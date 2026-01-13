@@ -20,7 +20,6 @@ export function buildInventoryItemRoutes(controller: InventoryItemController): R
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
     ]),
     controller.listInventoryItems,
   );
@@ -39,7 +38,6 @@ export function buildInventoryItemRoutes(controller: InventoryItemController): R
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
     ]),
     controller.getInventoryItem,
   );

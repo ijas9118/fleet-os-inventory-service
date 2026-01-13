@@ -17,7 +17,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.listStock,
   );
@@ -35,7 +35,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.getWarehouseStock,
   );
@@ -46,7 +46,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.getStock,
   );
@@ -57,7 +57,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.addStock,
   );
@@ -68,7 +68,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.removeStock,
   );
@@ -86,7 +86,7 @@ export function buildStockRoutes(controller: StockController): Router {
     requireRole([
       UserRole.TENANT_ADMIN,
       UserRole.OPERATIONS_MANAGER,
-      UserRole.WAREHOUSE_MANAGER,
+
     ]),
     controller.transferStock,
   );

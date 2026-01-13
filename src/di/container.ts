@@ -1,8 +1,10 @@
 import { InventoryItemRepository } from "@/infrastructure/repositories/inventory-item.repository";
+import { ReservationRepository } from "@/infrastructure/repositories/reservation.repository";
 import { StockTransactionRepository } from "@/infrastructure/repositories/stock-transaction.repository";
 import { StockRepository } from "@/infrastructure/repositories/stock.repository";
 import { WarehouseRepository } from "@/infrastructure/repositories/warehouse.repository";
 import { InventoryItemController } from "@/presentation/controllers/inventory-item.controller";
+import { ReservationController } from "@/presentation/controllers/reservation.controller";
 import { StockTransactionController } from "@/presentation/controllers/stock-transaction.controller";
 import { StockController } from "@/presentation/controllers/stock.controller";
 import { WarehouseController } from "@/presentation/controllers/warehouse.controller";
@@ -12,6 +14,8 @@ import { GetInventoryItemUseCase } from "@/use-cases/inventory-item/get-inventor
 import { ListInventoryItemsUseCase } from "@/use-cases/inventory-item/list-inventory-items/list-inventory-items.usecase";
 import { UpdateInventoryItemStatusUseCase } from "@/use-cases/inventory-item/update-inventory-item-status/update-inventory-item-status.usecase";
 import { UpdateInventoryItemUseCase } from "@/use-cases/inventory-item/update-inventory-item/update-inventory-item.usecase";
+import { ReleaseReservationUseCase } from "@/use-cases/reservation/release-reservation";
+import { ReserveStockUseCase } from "@/use-cases/reservation/reserve-stock";
 import { GetStockTransactionUseCase } from "@/use-cases/stock-transaction/get-stock-transaction/get-stock-transaction.usecase";
 import { ListStockTransactionsUseCase } from "@/use-cases/stock-transaction/list-stock-transactions/list-stock-transactions.usecase";
 import { AddStockUseCase } from "@/use-cases/stock/add-stock/add-stock.usecase";
@@ -71,6 +75,11 @@ export function buildContainer() {
   const listStockTransactionsUC = new ListStockTransactionsUseCase(stockTransactionRepo);
   const getStockTransactionUC = new GetStockTransactionUseCase(stockTransactionRepo);
 
+  // Reservations
+  const reservationRepo = new ReservationRepository();
+  const reserveStockUC = new ReserveStockUseCase(reservationRepo, stockRepo);
+  const releaseReservationUC = new ReleaseReservationUseCase(reservationRepo, stockRepo);
+
   // --- Controllers ---
   const warehouseController = new WarehouseController(
     createWarehouseUC,
@@ -106,10 +115,16 @@ export function buildContainer() {
     getStockTransactionUC,
   );
 
+  const reservationController = new ReservationController(
+    reserveStockUC,
+    releaseReservationUC,
+  );
+
   return {
     warehouseController,
     inventoryItemController,
     stockController,
     stockTransactionController,
+    reservationController,
   };
 }

@@ -1,6 +1,10 @@
 export class InsufficientStockError extends Error {
-  constructor(available: number, requested: number) {
-    super(`Insufficient stock. Available: ${available}, Requested: ${requested}`);
+  constructor(
+    public sku: string,
+    public requested: number,
+    public available: number,
+  ) {
+    super(`Insufficient stock for ${sku}. Available: ${available}, Requested: ${requested}`);
     this.name = "InsufficientStockError";
   }
 }
