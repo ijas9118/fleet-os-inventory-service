@@ -18,6 +18,7 @@ export interface WarehouseProps {
   code: string;
   address: Address;
   status: WarehouseStatus;
+  deletedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -109,6 +110,10 @@ export class Warehouse {
     return this._props.updatedAt;
   }
 
+  get deletedAt(): Date | null | undefined {
+    return this._props.deletedAt;
+  }
+
   get propsSnapshot(): WarehouseProps {
     return {
       ...this._props,
@@ -127,6 +132,17 @@ export class Warehouse {
 
   close(): void {
     this._props.status = "CLOSED" as WarehouseStatus;
+  }
+
+  archive(): void {
+    this._props.status = "ARCHIVED" as WarehouseStatus;
+    this._props.deletedAt = new Date();
+    this._props.updatedAt = new Date();
+  }
+
+  updateStatus(newStatus: WarehouseStatus): void {
+    this._props.status = newStatus;
+    this._props.updatedAt = new Date();
   }
 
   updateDetails(updates: {

@@ -40,6 +40,10 @@ const WarehouseSchema = new Schema({
     enum: Object.values(WarehouseStatus),
     default: WarehouseStatus.ACTIVE,
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 }, {
   timestamps: true,
 });

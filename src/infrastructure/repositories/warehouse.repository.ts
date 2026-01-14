@@ -1,8 +1,7 @@
 import type { Warehouse, WarehouseProps } from "@/domain/entities";
-import type { IWareHouseRepository } from "@/domain/repositories";
+import type { IWareHouseRepository, ListWarehousesOptions } from "@/domain/repositories";
 
 import { Warehouse as WarehouseEntity } from "@/domain/entities";
-import { WarehouseStatus } from "@/domain/enums";
 
 import { WarehouseModel } from "../models/warehouse.model";
 
@@ -27,6 +26,7 @@ export class WarehouseRepository implements IWareHouseRepository {
           : undefined,
       },
       status: doc.status,
+      deletedAt: doc.deletedAt ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });
@@ -71,12 +71,89 @@ export class WarehouseRepository implements IWareHouseRepository {
     return this._mapToEntity(found);
   }
 
-  async listWarehouses(tenantId: string): Promise<Warehouse[]> {
-    const results = await WarehouseModel.find({
-      tenantId,
-      status: WarehouseStatus.ACTIVE,
-    }).lean();
+  async listWarehouses(options: ListWarehousesOptions): Promise<{ warehouses: Warehouse[]; total: number }> {
+    const { tenantId, page, limit, search, status, includeArchived } = options;
 
-    return results.map(doc => this._mapToEntity(doc));
+    // Build query - exclude archived warehouses by default unless includeArchived is true
+    const query: any = { tenantId };
+
+    if (!includeArchived) {
+      query.deletedAt = null;
+    }
+
+    // Filter by status if provided
+    if (status) {
+      query.status = status;
+    }
+
+    // Add search filter if provided
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { code: { $regex: search, $options: "i" } },
+        { "address.city": { $regex: search, $options: "i" } },
+        { "address.country": { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Calculate skip
+    const skip = (page - 1) * limit;
+
+    // Execute query with pagination
+    const [warehouses, total] = await Promise.all([
+      WarehouseModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      WarehouseModel.countDocuments(query),
+    ]);
+
+    return {
+      warehouses: warehouses.map(doc => this._mapToEntity(doc)),
+      total,
+    };
+  }
+
+  async findById(warehouseId: string, tenantId: string): Promise<Warehouse | null> {
+    const found = await WarehouseModel.findOne({ _id: warehouseId, tenantId }).lean();
+
+    if (!found)
+      return null;
+
+    return this._mapToEntity(found);
+  }
+
+  async updateWarehouse(warehouseId: string, updates: Partial<WarehouseProps>): Promise<Warehouse> {
+    // Transform address coordinates to GeoJSON format if address is being updated
+    const mongoUpdates: any = { ...updates };
+
+    if (updates.address) {
+      mongoUpdates.address = {
+        line1: updates.address.line1,
+        city: updates.address.city,
+        state: updates.address.state,
+        postalCode: updates.address.postalCode,
+        country: updates.address.country,
+        coordinates: updates.address.coordinates
+          ? {
+              type: "Point",
+              coordinates: [updates.address.coordinates.lng, updates.address.coordinates.lat],
+            }
+          : undefined,
+      };
+    }
+
+    const updated = await WarehouseModel.findByIdAndUpdate(
+      warehouseId,
+      { $set: mongoUpdates },
+      { new: true },
+    ).lean();
+
+    if (!updated) {
+      throw new Error("Warehouse not found");
+    }
+
+    return this._mapToEntity(updated);
   }
 }

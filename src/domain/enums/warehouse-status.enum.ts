@@ -1,5 +1,1 @@
-export enum WarehouseStatus {
-  ACTIVE = "ACTIVE",
-  MAINTENANCE = "MAINTENANCE",
-  CLOSED = "CLOSED",
-}
+export { WarehouseStatus } from "@ahammedijas/fleet-os-shared";
