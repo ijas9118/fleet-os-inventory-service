@@ -14,6 +14,7 @@ import { GetInventoryItemUseCase } from "@/use-cases/inventory-item/get-inventor
 import { ListInventoryItemsUseCase } from "@/use-cases/inventory-item/list-inventory-items/list-inventory-items.usecase";
 import { UpdateInventoryItemStatusUseCase } from "@/use-cases/inventory-item/update-inventory-item-status/update-inventory-item-status.usecase";
 import { UpdateInventoryItemUseCase } from "@/use-cases/inventory-item/update-inventory-item/update-inventory-item.usecase";
+import { ConfirmReservationUseCase } from "@/use-cases/reservation/confirm-reservation";
 import { ReleaseReservationUseCase } from "@/use-cases/reservation/release-reservation";
 import { ReserveStockUseCase } from "@/use-cases/reservation/reserve-stock";
 import { GetStockTransactionUseCase } from "@/use-cases/stock-transaction/get-stock-transaction/get-stock-transaction.usecase";
@@ -79,6 +80,7 @@ export function buildContainer() {
   const reservationRepo = new ReservationRepository();
   const reserveStockUC = new ReserveStockUseCase(reservationRepo, stockRepo);
   const releaseReservationUC = new ReleaseReservationUseCase(reservationRepo, stockRepo);
+  const confirmReservationUC = new ConfirmReservationUseCase(reservationRepo, removeStockUC);
 
   // --- Controllers ---
   const warehouseController = new WarehouseController(
@@ -118,6 +120,7 @@ export function buildContainer() {
   const reservationController = new ReservationController(
     reserveStockUC,
     releaseReservationUC,
+    confirmReservationUC,
   );
 
   return {

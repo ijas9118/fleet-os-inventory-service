@@ -17,5 +17,8 @@ export function buildReservationRoutes(controller: ReservationController): Route
   // Release reservation
   router.post("/release", controller.releaseReservation);
 
+  // Confirm reservation (deduct actual stock)
+  router.post("/confirm", controller.confirmReservation);
+
   return router;
 }

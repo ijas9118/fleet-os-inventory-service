@@ -143,6 +143,19 @@ export class Reservation {
     this._props.updatedAt = new Date();
   }
 
+  confirm(): void {
+    if (this._props.status === "CONFIRMED") {
+      return; // Idempotent
+    }
+
+    if (this._props.status !== "RESERVED") {
+      throw new ValidationError("Can only confirm a reserved reservation");
+    }
+
+    this._props.status = "CONFIRMED" as ReservationStatus;
+    this._props.updatedAt = new Date();
+  }
+
   expire(): void {
     if (this._props.status !== "RESERVED") {
       return; // Only expire if still reserved

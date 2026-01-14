@@ -3,7 +3,7 @@ import { Router } from "express";
 
 import type { StockController } from "../controllers/stock.controller";
 
-import { requireAuth, requireRole } from "../middlewares";
+import { internalAuth, requireAuth, requireRole } from "../middlewares";
 
 export function buildStockRoutes(controller: StockController): Router {
   const router = Router();
@@ -90,6 +90,19 @@ export function buildStockRoutes(controller: StockController): Router {
     ]),
     controller.transferStock,
   );
+
+  return router;
+}
+
+// Internal stock routes for service-to-service operations
+export function buildInternalStockRoutes(controller: StockController): Router {
+  const router = Router();
+
+  // Internal routes use internal API key authentication
+  router.use(internalAuth);
+
+  // Add stock - for returning/cancelled shipments
+  router.post("/add", controller.addStock);
 
   return router;
 }

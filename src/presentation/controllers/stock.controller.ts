@@ -154,7 +154,9 @@ export class StockController {
   });
 
   addStock = asyncHandler(async (req: Request, res: Response) => {
-    const tenantId = req.user?.tenantId;
+    // For internal API calls, tenantId comes from request body
+    // For user API calls, tenantId comes from req.user
+    const tenantId = req.body.tenantId || req.user?.tenantId;
 
     if (!tenantId) {
       return res.status(STATUS_CODES.FORBIDDEN).json({
